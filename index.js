@@ -34,7 +34,10 @@ const isArmstrong = (num) => {
 };
 
 const getDigitSum = (num) => {
-  return num.toString().split("").reduce((acc, d) => acc + Number(d), 0);
+  return Math.abs(num) // Convert to positive number
+    .toString()
+    .split("")
+    .reduce((acc, d) => acc + Number(d), 0);
 };
 
 app.get("/api/classify-number", async (req, res) => {
@@ -42,7 +45,7 @@ app.get("/api/classify-number", async (req, res) => {
   const num = parseInt(number, 10);
 
   if (isNaN(num)) {
-    return res.status(400).json({ number: "alphabet", error: true });
+    return res.status(400).json({ number, error: true });
   }
 
   const properties = [];
