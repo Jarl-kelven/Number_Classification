@@ -27,14 +27,14 @@ const isPerfect = (num) => {
 };
 
 const isArmstrong = (num) => {
-  const digits = num.toString().split("").map(Number);
+  const digits = Math.abs(num).toString().split("").map(Number);
   const power = digits.length;
   const sum = digits.reduce((acc, d) => acc + Math.pow(d, power), 0);
-  return sum === num;
+  return sum === Math.abs(num); // Armstrong check ignores negative sign
 };
 
 const getDigitSum = (num) => {
-  return Math.abs(num) // Convert to positive number
+  return Math.abs(num)
     .toString()
     .split("")
     .reduce((acc, d) => acc + Number(d), 0);
@@ -43,16 +43,17 @@ const getDigitSum = (num) => {
 app.get("/api/classify-number", async (req, res) => {
   const { number } = req.query;
 
-  if (number === undefined || number.trim() === "") {
+  // ✅ If number is empty, return null response
+  if (!number || number.trim() === "") {
     return res.status(400).json({ number: null, error: true });
   }
 
-  const num = parseInt(number, 10);
-
-  if (isNaN(num)) {
-    return res.status(400).json({ number, error: true });
+  // ✅ Check if input is a valid integer
+  if (!/^-?\d+$/.test(number)) {
+    return res.status(400).json({ number: "alphabet", error: true });
   }
 
+  const num = parseInt(number, 10);
 
   const properties = [];
   if (isArmstrong(num)) properties.push("armstrong");
@@ -61,6 +62,7 @@ app.get("/api/classify-number", async (req, res) => {
   try {
     const funFactResponse = await axios.get(`http://numbersapi.com/${num}/math?json`);
     const funFact = funFactResponse.data.text;
+
     res.json({
       number: num,
       is_prime: isPrime(num),
